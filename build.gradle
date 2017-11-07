@@ -1,0 +1,105 @@
+plugins {
+	id 'java'
+    id 'eclipse'
+	id 'org.springframework.boot'
+	id 'net.researchgate.release' version '2.4.0'	
+}
+
+buildscript {
+	ext {
+		springBootVersion = '1.5.8.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+
+group = 'com.navent.realestate'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+
+jar {
+	baseName = rootProject.name
+	version =  version
+}
+
+//https://github.com/researchgate/gradle-release
+release {
+	failOnUnversionedFiles = false
+	scmAdapters = [net.researchgate.release.GitAdapter]
+	git {
+		requireBranch = ''
+	}
+}
+
+ext {
+	groupPOM = 'com.navent.realestate'
+	artefactPOM = rootProject.name
+	versionPOM = version
+	versionPOM = project.hasProperty('OverridetheVersion') ? project.OverridetheVersion : versionPOM
+
+	if(versionPOM.endsWith('-SNAPSHOT')) {
+		urlRepository = "$nexusBase/repositories/snapshots/"
+	} else {
+		urlRepository = "$nexusBase/repositories/releases/"
+	}
+	springCloudVersion = 'Dalston.SR4'
+}
+
+task sourceJar(type: Jar, dependsOn: classes) {
+	classifier = 'sources'
+	from sourceSets.main.allSource
+}
+
+apply plugin: 'maven-publish'
+
+publish {
+	// Esto hace que se llame a bootRepackage para que se genere correctamente el Jar
+	dependsOn assemble
+}
+
+publishing {
+	publications {
+		maven(MavenPublication) {
+			groupId groupPOM
+			artifactId artefactPOM
+			version versionPOM
+
+			from components.java
+
+			artifact sourceJar {
+				classifier "sources"
+			}
+		}
+	}
+	repositories {
+		maven {
+			credentials {
+				username "$nexusUser"
+				password "$nexusPass"
+			}
+			url urlRepository
+		}
+	}
+}
+
+dependencies {
+	compile('org.springframework.cloud:spring-cloud-starter-hystrix-dashboard')
+	compile("org.springframework.boot:spring-boot-starter-actuator")
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
