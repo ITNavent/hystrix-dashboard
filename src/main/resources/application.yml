@@ -1,0 +1,28 @@
+server.port: 8080
+
+spring:
+  cloud:
+    discovery:
+      enabled: false
+
+eureka:
+  client:
+    enabled: false
+
+security:
+    basic.enabled: false
+
+endpoints.metrics.sensitive: false
+
+spring.cloud.discovery.client.simple.instances.psa-stg[0].uri: "http://rcpsa-stg-webapp-1.navent.biz:8080"
+spring.cloud.discovery.client.simple.instances.psa-prd[0].uri: "http://rcpsa-prd-webapp-1.navent.biz:8080"
+spring.cloud.discovery.client.simple.instances.psa-prd[1].uri: "http://rcpsa-prd-webapp-2.navent.biz:8080"
+
+turbine:
+  aggregator:
+    clusterConfig: psa-stg,psa-prd
+  appConfig: psa-stg,psa-prd
+  instanceUrlSuffix: /hystrix.stream
+  ConfigPropertyBasedDiscovery:
+    psa-stg.instances: [rcpsa-stg-webapp-1.navent.biz]
+    psa-prd.instances: [rcpsa-prd-webapp-1.navent.biz, rcpsa-prd-webapp-2.navent.biz]

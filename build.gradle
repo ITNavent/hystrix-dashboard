@@ -80,7 +80,12 @@ publishing {
 }
 
 dependencies {
-	compile('org.springframework.cloud:spring-cloud-starter-hystrix-dashboard')
+	compile('org.springframework.cloud:spring-cloud-starter-hystrix-dashboard') {
+		exclude group: 'com.netflix.eureka', module: 'eureka-client'
+	}
+	compile('org.springframework.cloud:spring-cloud-starter-turbine') {
+		exclude group: 'com.netflix.eureka', module: 'eureka-client'
+	}
 	compile("org.springframework.boot:spring-boot-starter-actuator")
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
