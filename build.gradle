@@ -79,6 +79,8 @@ publishing {
 	}
 }
 
+afterReleaseBuild.dependsOn publish
+
 dependencies {
 	compile('org.springframework.cloud:spring-cloud-starter-hystrix-dashboard') {
 		exclude group: 'com.netflix.eureka', module: 'eureka-client'
